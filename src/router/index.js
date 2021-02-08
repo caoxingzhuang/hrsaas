@@ -47,28 +47,28 @@ export const constantRoutes = [
     redirect: '/dashboard',
     children: [{
       path: 'dashboard',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
-    },
-    {
-      path: '/import',
-      component: Layout,
-      hidden: true, // 隐藏在左侧菜单中
-      children: [{
-        path: '', // 二级路由path什么都不写 表示二级默认路由
-        component: () => import('@/views/import')
-      }]
-    }
-    ]
+    }]
   },
-
+  {
+    path: '/import',
+    component: Layout,
+    hidden: true, // 隐藏在左侧菜单中
+    children: [{
+      path: '', // 二级路由path什么都不写 表示二级默认路由
+      component: () => import('@/views/import')
+    }]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  // mode: 'history', // require service support , ...asyncRoutes
+  mode: 'history',
+  base: '/hr/',
   scrollBehavior: () => ({ y: 0 }),
   routes: [...constantRoutes, ...asyncRoutes]
 })

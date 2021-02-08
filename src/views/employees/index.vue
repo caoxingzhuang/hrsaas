@@ -4,7 +4,7 @@
       <page-tools :show-before="true">
         <span slot="before">共166条记录</span>
         <template slot="after">
-          <el-button size="small" type="warning">导入</el-button>
+          <el-button size="small" type="warning" @click="$router.push('/import?type=user')">导入</el-button>
           <el-button size="small" type="danger">导出</el-button>
           <el-button size="small" type="primary" @click="showDialog = true">新增员工</el-button>
         </template>
@@ -24,23 +24,24 @@
             <template slot-scope="{ row }"><el-switch :value="row.enableState === 1" /></template>
           </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280">
-            <template slot-scope="{ row }">
-              <el-button type="text" size="small">查看</el-button>
+            <template v-slot="{ row }">
+              <el-button type="text" size="small" @click="$router.push(`/employees/detail/${row.id}`)">查看</el-button>
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="editRole(row.id)">角色</el-button>
               <el-button type="text" size="small" @click="deleteEmployee(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
         <!-- 分页组件 -->
         <el-row type="flex" justify="center" align="middle" style="height: 60px">
-          <el-pagination layout="prev, pager, next" :page-size="page.size" :current-page="page.page" :total="page.total" @current-change="changePage"/>
+          <el-pagination layout="prev, pager, next" :page-size="page.size" :current-page="page.page" :total="page.total" @current-change="changePage" />
         </el-row>
       </el-card>
       <!-- 新增员工 -->
       <add-employee :show-dialog.sync="showDialog" />
+      <assign-role ref="assignRole" :show-role-dialog.sync="showRoleDialog" :user-id="userId" />
     </div>
   </div>
 </template>
@@ -49,12 +50,16 @@
 import AddEmployee from './components/add-employee'
 import { getEmployeeList, delEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
+import assignRole from './components/assign-role'
 export default {
   components: {
-    AddEmployee
+    AddEmployee,
+    assignRole
   },
   data() {
     return {
+      showRoleDialog: false,
+      userId: null,
       showDialog: false,
       loading: false,
       list: [], // 接数据的
@@ -96,6 +101,11 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    async  editRole(id) {
+      this.userId = id // props传值 是异步的
+      await this.$refs.assignRole.getUserDetailById(id) // 父组件调用子组件方法
+      this.showRoleDialog = true
     }
   }
 }
